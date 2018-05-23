@@ -28,7 +28,7 @@ void putch(char data) {
  * Configuration de la EUSART comme sortie asynchrone à 1200 bauds.
  * On assume que le PIC18 fonctionne à Fosc = 1MHz.
  */
-void EUSART_Initialize() {
+void EUSART_initialise() {
     // Pour une fréquence de 1MHz, ceci donne 1200 bauds:
     SPBRG = 12;
     SPBRGH = 0;
@@ -220,14 +220,9 @@ void interrupt interruptions()
 }
 
 /**
- * Point d'entrée.
- * Configure les interruptions, puis
- * les laisse faire le travail.
+ * Initialise le hardware.
  */
-void main() {
-    // Initialise la EUSART.
-    EUSART_Initialize();
-
+void HARDWARE_initialise() {
     // Pas de convertisseur A/D sur cette application:
     ANSELA = 0;
     ANSELB = 0;
@@ -273,7 +268,20 @@ void main() {
     INTCON3bits.INT1IE = 1; // Active les interruptions pour INT1.
 
     INTCON2bits.INTEDG0 = 0; // Interruptions de INT0 sur flanc descendant.
-    INTCON2bits.INTEDG1 = 0; // Interruptions de INT1 sur flanc descendant.
+    INTCON2bits.INTEDG1 = 0; // Interruptions de INT1 sur flanc descendant.    
+}
+
+/**
+ * Point d'entrée.
+ * Configure les interruptions, puis
+ * les laisse faire le travail.
+ */
+void main() {
+    // Initialise la EUSART.
+    EUSART_initialise();
+
+    // Initialise les autres périphériques.
+    HARDWARE_initialise();
 
     // Initialise l'horloge pour compter depuis zéro.
     HORLOGE_initialise();
